@@ -3,12 +3,6 @@
   "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
