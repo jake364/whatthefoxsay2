@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel Debug - Mockstagram</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+            line-height: 1.6;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff6b35;
+        }
+        .success { color: #28a745; font-weight: bold; }
+        .error { color: #dc3545; font-weight: bold; }
+        .info { color: #007bff; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { 
+            background: #ff6b35; 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Vercel Deployment Debug Page</h1>
+    
+    <div class="test-section">
+        <h2>1. Basic JavaScript Test</h2>
+        <div id="js-test">Testing...</div>
+        <script>
+            document.getElementById('js-test').innerHTML = '<span class="success">✅ JavaScript is working</span>';
+        </script>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Module Support Test</h2>
+        <div id="module-test">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. File Loading Tests</h2>
+        <button onclick="testFile('src/fox-gallery.js', 'main-module')">Test Main Module</button>
+        <button onclick="testFile('src/fox-photo-card.js', 'card-module')">Test Card Module</button>
+        <button onclick="testFile('data/social-posts.json', 'data-file')">Test Data File</button>
+        <div id="file-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Custom Elements Test</h2>
+        <div id="custom-elements-test">Testing...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Network Errors</h2>
+        <div id="network-errors">Monitoring...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Try Loading Gallery</h2>
+        <button onclick="loadGallery()">Load fox-gallery Component</button>
+        <div id="gallery-container"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Console Log</h2>
+        <div id="console-log"></div>
+    </div>
+
+    <script type="module">
+        const moduleTest = document.getElementById('module-test');
+        const customElementsTest = document.getElementById('custom-elements-test');
+        const networkErrors = document.getElementById('network-errors');
+        const consoleLog = document.getElementById('console-log');
+
+        // Test module support
+        moduleTest.innerHTML = '<span class="success">✅ ES Modules are supported</span>';
+
+        // Test custom elements support
+        if (window.customElements) {
+            customElementsTest.innerHTML = '<span class="success">✅ Custom Elements are supported</span>';
+        } else {
+            customElementsTest.innerHTML = '<span class="error">❌ Custom Elements not supported</span>';
+        }
+
+        // Capture console messages
+        const logs = [];
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        console.log = function(...args) {
+            logs.push({type: 'log', message: args.join(' ')});
+            updateConsoleLog();
+            originalLog.apply(console, arguments);
+        };
+        
+        console.error = function(...args) {
+            logs.push({type: 'error', message: args.join(' ')});
+            updateConsoleLog();
+            originalError.apply(console, arguments);
+        };
+
+        function updateConsoleLog() {
+            consoleLog.innerHTML = logs.map(log => 
+                `<div class="${log.type}">${log.type.toUpperCase()}: ${log.message}</div>`
+            ).join('');
+        }
+
+        // Monitor network errors
+        const errors = [];
+        window.addEventListener('error', (e) => {
+            errors.push(`Script error: ${e.message} at ${e.filename}:${e.lineno}`);
+            updateNetworkErrors();
+        });
+
+        function updateNetworkErrors() {
+            networkErrors.innerHTML = errors.length > 0 
+                ? errors.map(e => `<div class="error">${e}</div>`).join('')
+                : '<span class="success">No network errors detected</span>';
+        }
+
+        // Test file loading function
+        window.testFile = async function(url, resultId) {
+            const resultsDiv = document.getElementById('file-results');
+            const testDiv = document.createElement('div');
+            testDiv.id = resultId;
+            testDiv.innerHTML = `<div class="info">Testing ${url}...</div>`;
+            resultsDiv.appendChild(testDiv);
+
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    testDiv.innerHTML = `<div class="success">✅ ${url} loaded successfully (${contentType})</div>`;
+                } else {
+                    testDiv.innerHTML = `<div class="error">❌ ${url} failed: ${response.status} ${response.statusText}</div>`;
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="error">❌ ${url} error: ${error.message}</div>`;
+            }
+        };
+
+        // Load gallery function
+        window.loadGallery = async function() {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = '<div class="info">Loading gallery...</div>';
+
+            try {
+                // Try to import the module
+                await import('./src/fox-gallery.js');
+                
+                // Check if element is registered
+                if (customElements.get('fox-gallery')) {
+                    container.innerHTML = `
+                        <div class="success">✅ fox-gallery imported and registered</div>
+                        <fox-gallery></fox-gallery>
+                    `;
+                } else {
+                    container.innerHTML = '<div class="error">❌ fox-gallery not registered after import</div>';
+                }
+            } catch (error) {
+                container.innerHTML = `<div class="error">❌ Failed to import fox-gallery: ${error.message}</div>`;
+            }
+        };
+
+        // Auto-run some tests
+        setTimeout(() => {
+            if (errors.length === 0) {
+                updateNetworkErrors();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>

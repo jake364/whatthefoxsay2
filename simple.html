@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockstagram - Simple Version</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color, #fafafa);
+            color: var(--text-color, #262626);
+            transition: all 0.3s ease;
+        }
+
+        /* Theme variables */
+        :root {
+            --bg-color: #fafafa;
+            --text-color: #262626;
+            --card-bg: white;
+            --border-color: #dbdbdb;
+            --accent-color: #ff6b35;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-bg: #1e1e1e;
+            --border-color: #333;
+        }
+
+        header {
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 935px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-color);
+        }
+
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 1rem;
+            margin: 1rem 20px;
+            border-radius: 4px;
+        }
+
+        .gallery-container {
+            max-width: 935px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                📸 Mockstagram
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()">
+                🌙 Dark Mode
+            </button>
+        </div>
+    </header>
+
+    <main class="gallery-container">
+        <div id="loading" class="loading">
+            Loading Mockstagram gallery...
+        </div>
+        <div id="error" class="error-message" style="display: none;">
+            Failed to load gallery. Please check the console for errors.
+        </div>
+        <div id="gallery-mount"></div>
+    </main>
+
+    <script>
+        // Theme toggle functionality
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                button.textContent = '☀️ Light Mode';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                button.textContent = '🌙 Dark Mode';
+            }
+        }
+
+        // Load gallery component
+        async function loadGallery() {
+            try {
+                console.log('Attempting to load fox-gallery component...');
+                
+                // Import the module
+                await import('./src/fox-gallery.js');
+                console.log('Module imported successfully');
+                
+                // Wait a bit for registration
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // Check if element is registered
+                if (customElements.get('fox-gallery')) {
+                    console.log('fox-gallery element registered');
+                    
+                    // Hide loading, show gallery
+                    document.getElementById('loading').style.display = 'none';
+                    const galleryMount = document.getElementById('gallery-mount');
+                    galleryMount.innerHTML = '<fox-gallery></fox-gallery>';
+                    
+                    console.log('Gallery component mounted');
+                } else {
+                    throw new Error('fox-gallery element not registered');
+                }
+            } catch (error) {
+                console.error('Failed to load gallery:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error').innerHTML = `
+                    Failed to load gallery: ${error.message}<br>
+                    <small>Check the browser console for more details.</small>
+                `;
+            }
+        }
+
+        // Start loading when page is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadGallery);
+        } else {
+            loadGallery();
+        }
+    </script>
+</body>
+</html>

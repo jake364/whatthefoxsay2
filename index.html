@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mockstagram - Social Photo Gallery</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background-color: var(--bg-color, #fafafa);
+            color: var(--text-color, #000000);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-color, #ffffff);
+            border-bottom: 1px solid var(--border-color, #dbdbdb);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --border-color: #262626;
+        }
+        
+        [data-theme="light"] {
+            --bg-color: #fafafa;
+            --text-color: #000000;
+            --border-color: #dbdbdb;
+        }
+        
+        [data-theme="dark"] .header {
+            background: #000000;
+        }
+        
+        [data-theme="light"] .header {
+            background: #ffffff;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px;
+            border: none;
+            border-radius: 50%;
+            background: var(--text-color);
+            color: var(--bg-color);
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <div class="header">
+        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+        <h1>Mockstagram 📸</h1>
+    </div>
+    
+    <div id="gallery-status">Loading...</div>
+    <fox-gallery id="main-gallery" style="display: none;"></fox-gallery>
+    
+    <script type="module">
+        try {
+            console.log('Loading fox-gallery module...');
+            await import('./src/fox-gallery.js');
+            console.log('Module loaded successfully');
+            
+            // Wait for custom element registration
+            if (customElements.get('fox-gallery')) {
+                document.getElementById('gallery-status').style.display = 'none';
+                document.getElementById('main-gallery').style.display = 'block';
+                console.log('Gallery displayed');
+            } else {
+                document.getElementById('gallery-status').innerHTML = 'Error: Gallery component not registered';
+            }
+        } catch (error) {
+            console.error('Failed to load gallery:', error);
+            document.getElementById('gallery-status').innerHTML = `Error loading gallery: ${error.message}`;
+        }
+    </script>
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            
+            const toggleBtn = document.querySelector('.theme-toggle');
+            toggleBtn.textContent = newTheme === 'light' ? '🌙' : '☀️';
+        }
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', savedTheme);
+        document.querySelector('.theme-toggle').textContent = savedTheme === 'light' ? '🌙' : '☀️';
+    </script>
+</body>
+</html>

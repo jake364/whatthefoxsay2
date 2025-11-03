@@ -1,0 +1,46 @@
+{
+  "name": "what-the-fox-say",
+  "version": "1.0.0",
+  "description": "A responsive photo gallery featuring fox photos with like/dislike functionality and sharing capabilities",
+  "main": "index.html",
+  "type": "module",
+  "scripts": {
+    "start": "web-dev-server --node-resolve --open",
+
+    "serve": "web-dev-server --node-resolve --open --port 8000",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "analyze": "wca analyze 'src/**/*.js' --outFile custom-elements.json",
+    "hax:create": "hax webcomponent",
+    "hax:gallery": "echo 'HAX Gallery not configured yet'",
+    "dev": "web-dev-server --node-resolve --watch --open"
+  },
+  "keywords": [
+    "webcomponents",
+    "lit", 
+    "gallery",
+    "fox",
+    "photos",
+    "responsive",
+    "DDD",
+    "hax",
+    "social",
+    "instagram",
+    "mockstagram"
+  ],
+  "hax": true,
+  "webcomponents": "./custom-elements.json",
+  "author": "Jake7",
+  "license": "ISC",
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@web/dev-server": "^0.4.6",
+    "@web/dev-server-rollup": "^0.6.4",
+    "lit": "^3.3.1",
+    "rollup": "^4.52.5"
+  },
+  "devDependencies": {
+    "@haxtheweb/create": "^11.0.7",
+    "web-component-analyzer": "^2.0.0"
+  }
+}

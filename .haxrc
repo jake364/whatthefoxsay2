@@ -1,0 +1,140 @@
+{
+  "name": "mockstagram-gallery",
+  "description": "Instagram-style photo gallery with HAX webcomponents and DDD architecture",
+  "author": "Jake7",
+  "version": "1.0.0",
+  "license": "ISC",
+  "type": "module",
+  "hax": true,
+  "webcomponents": {
+    "fox-gallery": {
+      "tag": "fox-gallery", 
+      "class": "FoxGallery",
+      "path": "./src/fox-gallery.js",
+      "description": "Instagram-style photo gallery with social interactions and DDD architecture",
+      "demo": "demo/index.html",
+      "gizmo": {
+        "title": "Photo Gallery",
+        "description": "Social media style photo gallery",
+        "icon": "image:photo-library",
+        "color": "orange",
+        "groups": ["Media", "Social"],
+        "handles": [
+          {
+            "type": "image",
+            "source": "foxPhotos"
+          }
+        ],
+        "meta": {
+          "author": "Jake7",
+          "owner": "Mockstagram"
+        }
+      },
+      "properties": [
+        {
+          "name": "apiMode",
+          "type": "String",
+          "value": "custom",
+          "description": "API mode: 'random' for fox API or 'custom' for social feed",
+          "inputMethod": "select",
+          "options": {
+            "random": "Random Fox Photos",
+            "custom": "Social Feed"
+          }
+        },
+        {
+          "name": "foxPhotos",
+          "type": "Array",
+          "description": "Array of photo objects to display",
+          "readOnly": true
+        }
+      ],
+      "settings": {
+        "configure": [
+          {
+            "property": "apiMode",
+            "title": "Photo Source",
+            "description": "Choose the source for photos",
+            "inputMethod": "select"
+          }
+        ],
+        "advanced": []
+      }
+    },
+    "fox-photo-card": {
+      "tag": "fox-photo-card",
+      "class": "FoxPhotoCard", 
+      "path": "./src/fox-photo-card.js",
+      "description": "Instagram-style photo card with lazy loading and social interactions",
+      "demo": "demo/index.html",
+      "gizmo": {
+        "title": "Photo Card",
+        "description": "Individual photo card with social features",
+        "icon": "image:photo",
+        "color": "purple",
+        "groups": ["Media", "Social"],
+        "handles": [
+          {
+            "type": "image",
+            "source": "photo.source"
+          }
+        ],
+        "meta": {
+          "author": "Jake7",
+          "owner": "Mockstagram"
+        }
+      },
+      "properties": [
+        {
+          "name": "photo",
+          "type": "Object",
+          "description": "Photo object containing all metadata",
+          "properties": {
+            "id": "String",
+            "source": "String", 
+            "title": "String",
+            "author": "Object"
+          }
+        }
+      ],
+      "events": [
+        {
+          "name": "like",
+          "description": "Fired when user likes the photo"
+        },
+        {
+          "name": "dislike", 
+          "description": "Fired when user dislikes the photo"
+        },
+        {
+          "name": "share",
+          "description": "Fired when user shares the photo"
+        }
+      ],
+      "settings": {
+        "configure": [
+          {
+            "property": "photo",
+            "title": "Photo Data",
+            "description": "Configure photo content and metadata",
+            "inputMethod": "object"
+          }
+        ],
+        "advanced": []
+      }
+    }
+  },
+  "build": {
+    "outputDir": "./dist",
+    "entryPoint": "./index.html",
+    "rollup": {
+      "format": "es"
+    }
+  },
+  "dev": {
+    "port": 3000,
+    "host": "localhost",
+    "open": true
+  },
+  "haxManifest": "./custom-elements.json"
+}
